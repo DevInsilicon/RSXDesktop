@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RSX</title>
+</head>
+<body>
+    <img alt="awaiting frame" id="framedata" style="position:absolute; width:100%; left:0%; height: 100%; top:0%;"></img>
+
+
+    <script>
+
+        // Fetch from :3000/screenshot
+        // Set img src to data:image/png;base64,${data}
+        window.onload = function() {
+        setInterval(() => {
+            fetch('http://localhost:3000/screenshot')
+            .then(response => response.text())
+            .then(data => {
+                console.log(data);
+                document.getElementById('framedata').src = `data:image/png;base64,${data}`;
+            });
+        }, 10)
+    }
+
+    </script>
+</body>
+</html>
