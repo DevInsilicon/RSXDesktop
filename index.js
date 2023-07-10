@@ -41,6 +41,11 @@ app.get('/', (req, res) => {
     res.sendFile(__dirname + '/public/index.html');
 })
 
+// ON /mouse.png GET REQUEST
+app.get('/mouse', (req, res) => {
+    res.sendFile(__dirname + '/public/mouse.png');
+})
+
 app.listen(80, () => {
     console.log("Server started on port 80")
 })
@@ -84,6 +89,7 @@ api.get("/screenshot", async (req, res) => {
 });
 
 api.get("/emulateclick", async (req, res) => {
+    console.log("click");
     //get query X,Y
     let x = req.query.x;
     let y = req.query.y;
@@ -94,10 +100,11 @@ api.get("/emulateclick", async (req, res) => {
     //send acceptance packet
     res.send(packets.accepted);
 
-
+                
 })
 
 api.get("/movepos", async (req, res) => {
+    console.log("movepos");
     let pack = {
         x: robot.getMousePos().x,
         y: robot.getMousePos().y,
