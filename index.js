@@ -3,9 +3,30 @@
 // IMPORT DEPS
 const express = require('express');
 const ss = require('screenshot-desktop');
+//IMPORT KEYBOARD & MOUSE EMULATOR
+const robot = require("robotjs");
 
 // INIT EXPRESS WEBSITE
 const app = express();
+
+
+//INIT ROBOTJS
+robot.setMouseDelay(2);
+robot.setKeyboardDelay(2);
+
+let screenSize = robot.getScreenSize();
+
+
+//API PACKETS
+let packets = {
+    'accepted': {
+        'type': 'acceptance',
+    },
+    'rejected': {
+        'type': 'rejection',
+    }
+}
+
 
 app.use(function (req, res, next) {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -61,3 +82,53 @@ api.get("/screenshot", async (req, res) => {
     let base64 = await imgToBase64();
     res.send(base64);
 });
+
+api.get("/emulateclick", async (req, res) => {
+    //get query X,Y
+    let x = req.query.x;
+    let y = req.query.y;
+
+    //move mouse to X,Y
+    robot.moveMouse(x, y);
+    robot.mouseClick();
+    //send acceptance packet
+    res.send(packets.accepted);
+
+
+})
+
+api.get("/emulatemove", async (req, res) => {
+    //get query X,Y
+    let x = req.query.x;
+    let y = req.query.y;
+
+    //move mouse to X,Y
+    robot.moveMouse(x, y);
+
+    //send acceptance packet
+    res.send(packets.accepted);
+})
+
+
+api.get("/emulatekeyboard", async (req, res) => {
+    //get query X,Y
+    let key = req.query.key;
+
+    //convert character to keycode
+    let keycode = robot.keycode(key);
+    robot.keyTap(keycode);
+
+    //send acceptance packet
+    res.send(packets.accepted);
+});
+
+api.get("/screensize", async (req, res) => {
+    let pack = {
+        width: screenSize.width,
+        height: screenSize.height,
+        package: packets.accepted
+    }
+
+    res.send(pack);
+})
+

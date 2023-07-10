@@ -11,17 +11,61 @@
 
     <script>
 
-        // Fetch from :3000/screenshot
+        //get website address
+        let website = window.location.href;
+        //substring
+        //let sip = website.substring(0, website.length - 1) + ":3000";
+        let sip = "http://localhost:3000";
+        
+        let screensize = {
+            x: 1920,
+            y: 1080
+        }
+        let WebToScreenMultiX = 1;
+        let WebToScreenMultiY = 1;
+
+        // Fetch from :3000/api/screenshot
         // Set img src to data:image/png;base64,${data}
         window.onload = function() {
         setInterval(() => {
-            fetch('http://localhost:3000/screenshot')
+            fetch(sip + '/screenshot')
             .then(response => response.text())
             .then(data => {
-                console.log(data);
+                
                 document.getElementById('framedata').src = `data:image/png;base64,${data}`;
             });
+            console.log(sip)
+
+            
         }, 10)
+
+        //MOUSE MOVE EVENT
+        document.addEventListener('mousemove', (event) => {
+            fetch(sip+"/emulatemove?x="+event.clientX.toString()+"&y="+event.clientY.toString())
+            .then(response => response.json())
+            .then(data => {
+                if (data.type=="acceptance") {
+                    console.log("accepted")
+                }
+            })
+        })
+
+        
+        //get width in pixels 
+        
+        //IN ARRAY
+        fetch(sip+"/screensize")
+            .then(response => response.json())
+            .then(data => {
+                console.log(data)
+                screensize.x = data.width;
+                screensize.y = data.height;
+                console.log("Confirmed screensize")
+            })
+
+        //set multipler from mouse on THIS web to POS on screen IN PIXELS
+        WebToScreenMultiX = screensize.x / window.innerWidth;
+        WebToScreenMultiY = screensize.y / window.innerHeight;
     }
 
     </script>
