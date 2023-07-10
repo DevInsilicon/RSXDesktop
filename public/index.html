@@ -53,12 +53,8 @@
                         document.getElementById('mouse').style.left = ((data.x - xOffset) / WebToScreenMultiX) - 50 + "px";
                         document.getElementById('mouse').style.top = ((data.y - yOffset) / WebToScreenMultiY)- 50 + "px";
                     });
-            }, 10);
-        };
 
-        //MOUSE MOVE EVENT
-        document.addEventListener('mousemove', (event) => {
-            let x = (event.clientX + window.pageXOffset) * WebToScreenMultiX;
+                    let x = (event.clientX + window.pageXOffset) * WebToScreenMultiX;
             let y = (event.clientY + window.pageYOffset) * WebToScreenMultiY;
             fetch(sip + "/emulatemove?x=" + x.toString() + "&y=" + y.toString())
                 .then(response => response.json())
@@ -67,7 +63,10 @@
                         console.log("accepted");
                     }
                 });
-        });
+            }, 10);
+        };
+
+        
 
         //MOUSE CLICK EVENT
         document.addEventListener('click', (event) => {
