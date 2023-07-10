@@ -7,6 +7,7 @@
 </head>
 <body>
     <img alt="awaiting frame" id="framedata" style="position:absolute; width:100%; left:0%; height: 100%; top:0%;"></img>
+    <img src="./mouse.png" id="mouse" style="position:absolute; width:10px; left:0%; height: 10px; top:0%;"></img>
 
 
     <script>
@@ -34,14 +35,22 @@
                 
                 document.getElementById('framedata').src = `data:image/png;base64,${data}`;
             });
-            console.log(sip)
+            
+            fetch(sip + '/movepos')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('mouse').style.left = data.x / WebToScreenMultiX + "px";
+                document.getElementById('mouse').style.top = data.y / WebToScreenMultiY + "px";
+            });
 
             
         }, 10)
 
         //MOUSE MOVE EVENT
         document.addEventListener('mousemove', (event) => {
-            fetch(sip+"/emulatemove?x="+event.clientX.toString()+"&y="+event.clientY.toString())
+            let x = event.clientX * WebToScreenMultiX;
+            let y = event.clientY * WebToScreenMultiY;
+            fetch(sip+"/emulatemove?x="+x.toString()+"&y="+y.toString())
             .then(response => response.json())
             .then(data => {
                 if (data.type=="acceptance") {

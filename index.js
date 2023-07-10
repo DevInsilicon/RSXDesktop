@@ -97,6 +97,15 @@ api.get("/emulateclick", async (req, res) => {
 
 })
 
+api.get("/movepos", async (req, res) => {
+    let pack = {
+        x: robot.getMousePos().x,
+        y: robot.getMousePos().y,
+    }
+
+    res.send(pack);
+})
+
 api.get("/emulatemove", async (req, res) => {
     //get query X,Y
     let x = req.query.x;
