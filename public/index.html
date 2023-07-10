@@ -7,76 +7,80 @@
 </head>
 <body>
     <img alt="awaiting frame" id="framedata" style="position:absolute; width:100%; left:0%; height: 100%; top:0%;"></img>
-    <img src="./mouse.png" id="mouse" style="position:absolute; width:10px; left:0%; height: 10px; top:0%;"></img>
+    <img src="/mouse" id="mouse" style="position:absolute; width:100px; left:0%; height: 100px; top:0%;"></img>
 
 
     <script>
-
-        //get website address
         let website = window.location.href;
-        //substring
-        //let sip = website.substring(0, website.length - 1) + ":3000";
         let sip = "http://localhost:3000";
-        
+
         let screensize = {
             x: 1920,
             y: 1080
-        }
+        };
         let WebToScreenMultiX = 1;
         let WebToScreenMultiY = 1;
+
+        fetch(sip + "/screensize")
+            .then(response => response.json())
+            .then(data => {
+                screensize.x = data.width;
+                screensize.y = data.height;
+                console.log("Confirmed screensize");
+                calculateMultipliers();
+            });
+
+        function calculateMultipliers() {
+            WebToScreenMultiX = screensize.x / window.innerWidth;
+            WebToScreenMultiY = screensize.y / window.innerHeight;
+        }
 
         // Fetch from :3000/api/screenshot
         // Set img src to data:image/png;base64,${data}
         window.onload = function() {
-        setInterval(() => {
-            fetch(sip + '/screenshot')
-            .then(response => response.text())
-            .then(data => {
+            setInterval(() => {
+                fetch(sip + '/screenshot')
+                    .then(response => response.text())
+                    .then(data => {
+                        document.getElementById('framedata').src = `data:image/png;base64,${data}`;
+                    });
                 
-                document.getElementById('framedata').src = `data:image/png;base64,${data}`;
-            });
-            
-            fetch(sip + '/movepos')
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('mouse').style.left = data.x / WebToScreenMultiX + "px";
-                document.getElementById('mouse').style.top = data.y / WebToScreenMultiY + "px";
-            });
-
-            
-        }, 10)
+                fetch(sip + '/movepos')
+                    .then(response => response.json())
+                    .then(data => {
+                        let xOffset = window.pageXOffset;
+                        let yOffset = window.pageYOffset;
+                        document.getElementById('mouse').style.left = ((data.x - xOffset) / WebToScreenMultiX) - 50 + "px";
+                        document.getElementById('mouse').style.top = ((data.y - yOffset) / WebToScreenMultiY)- 50 + "px";
+                    });
+            }, 10);
+        };
 
         //MOUSE MOVE EVENT
         document.addEventListener('mousemove', (event) => {
-            let x = event.clientX * WebToScreenMultiX;
-            let y = event.clientY * WebToScreenMultiY;
-            fetch(sip+"/emulatemove?x="+x.toString()+"&y="+y.toString())
-            .then(response => response.json())
-            .then(data => {
-                if (data.type=="acceptance") {
-                    console.log("accepted")
-                }
-            })
-        })
+            let x = (event.clientX + window.pageXOffset) * WebToScreenMultiX;
+            let y = (event.clientY + window.pageYOffset) * WebToScreenMultiY;
+            fetch(sip + "/emulatemove?x=" + x.toString() + "&y=" + y.toString())
+                .then(response => response.json())
+                .then(data => {
+                    if (data.type == "acceptance") {
+                        console.log("accepted");
+                    }
+                });
+        });
 
-        
-        //get width in pixels 
-        
-        //IN ARRAY
-        fetch(sip+"/screensize")
-            .then(response => response.json())
-            .then(data => {
-                console.log(data)
-                screensize.x = data.width;
-                screensize.y = data.height;
-                console.log("Confirmed screensize")
-            })
-
-        //set multipler from mouse on THIS web to POS on screen IN PIXELS
-        WebToScreenMultiX = screensize.x / window.innerWidth;
-        WebToScreenMultiY = screensize.y / window.innerHeight;
-    }
-
+        //MOUSE CLICK EVENT
+        document.addEventListener('click', (event) => {
+            let x = (event.clientX + window.pageXOffset) * WebToScreenMultiX ;
+            let y = (event.clientY + window.pageYOffset) * WebToScreenMultiY;
+            fetch(sip + "/emulateclick?x=" + x.toString() + "&y=" + y.toString())
+                .then(response => response.json())
+                .then(data => {
+                    if (data.type == "acceptance") {
+                        console.log("accepted");
+                    }
+                });
+        });
     </script>
 </body>
 </html>
