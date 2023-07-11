@@ -10,9 +10,7 @@ const robot = require("robotjs");
 const app = express();
 
 
-//INIT ROBOTJS
-robot.setMouseDelay(2);
-robot.setKeyboardDelay(2);
+
 
 let screenSize = robot.getScreenSize();
 
@@ -100,11 +98,11 @@ api.get("/emulateclick", async (req, res) => {
     //send acceptance packet
     res.send(packets.accepted);
 
-                
+
 })
 
 api.get("/movepos", async (req, res) => {
-    console.log("movepos");
+    
     let pack = {
         x: robot.getMousePos().x,
         y: robot.getMousePos().y,

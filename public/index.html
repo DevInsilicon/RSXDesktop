@@ -12,7 +12,7 @@
 
     <script>
         let website = window.location.href;
-        let sip = "http://10.0.0.33:3000";
+        let sip = "http://localhost:3000";
 
         let screensize = {
             x: 1920,
@@ -44,7 +44,10 @@
                     .then(data => {
                         document.getElementById('framedata').src = `data:image/png;base64,${data}`;
                     });
-                
+            
+            }, 10);
+
+            setInterval(() => {
                 fetch(sip + '/movepos')
                     .then(response => response.json())
                     .then(data => {
@@ -53,31 +56,30 @@
                         document.getElementById('mouse').style.left = ((data.x - xOffset) / WebToScreenMultiX) - 50 + "px";
                         document.getElementById('mouse').style.top = ((data.y - yOffset) / WebToScreenMultiY)- 50 + "px";
                     });
-
-                    let x = (event.clientX + window.pageXOffset) * WebToScreenMultiX;
-            let y = (event.clientY + window.pageYOffset) * WebToScreenMultiY;
-            fetch(sip + "/emulatemove?x=" + x.toString() + "&y=" + y.toString())
-                .then(response => response.json())
-                .then(data => {
-                    if (data.type == "acceptance") {
-                        console.log("accepted");
-                    }
-                });
-            }, 10);
+            }, 100)
         };
 
         
 
         //MOUSE CLICK EVENT
         document.addEventListener('click', (event) => {
+            console.log("click");
             let x = (event.clientX + window.pageXOffset) * WebToScreenMultiX ;
             let y = (event.clientY + window.pageYOffset) * WebToScreenMultiY;
             fetch(sip + "/emulateclick?x=" + x.toString() + "&y=" + y.toString())
                 .then(response => response.json())
                 .then(data => {
-                    if (data.type == "acceptance") {
-                        console.log("accepted");
-                    }
+                    
+                });
+        });
+
+        //keypress
+        document.addEventListener('keypress', (event) => {
+            console.log("keypress");
+            fetch(sip + "/emulatekeyboard?key=" + event.key)
+                .then(response => response.json())
+                .then(data => {
+                    
                 });
         });
     </script>
